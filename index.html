@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final de curso 2025/26</title>
+  <style>
+    /* === Variables globales de color y dimensiones === */
+    :root {
+      --c-bg: #f0f2f5;
+      --c-header: #1a3a5c;
+      --c-acento: #1a6fc4;
+      --c-texto: #1a1a1a;
+      --c-tarjeta: #ffffff;
+      --c-vencida: #c0392b;
+      --c-urgente: #d35400;
+      --c-hecha: #888;
+      --radio: 10px;
+      --sombra: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* === Reset básico === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--c-bg);
+      color: var(--c-texto);
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ================================================
+       CABECERA FIJA
+       ================================================ */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--c-header);
+      color: #fff;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+    header h1 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.2;
+    }
+    #progreso {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+    #btn-mi-puesto {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.45);
+      color: #fff;
+      padding: 7px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-mi-puesto:active { background: rgba(255,255,255,0.32); }
+
+    /* ================================================
+       CONTENIDO PRINCIPAL (deja espacio a la cabecera)
+       ================================================ */
+    main {
+      padding-top: 64px;
+      padding-bottom: 32px;
+    }
+
+    /* ================================================
+       PANTALLA 1: SELECCIÓN DE PUESTO
+       ================================================ */
+    #pantalla-puesto {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 20px 14px;
+    }
+    #pantalla-puesto h2 {
+      font-size: 1.25rem;
+      color: var(--c-header);
+      margin-bottom: 4px;
+    }
+    #pantalla-puesto .subtitulo {
+      font-size: 0.88rem;
+      color: #555;
+      margin-bottom: 18px;
+    }
+
+    /* Tarjeta de grupo de opciones */
+    .grupo-opciones {
+      background: #fff;
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    /* Fila de opción principal (label cubre todo el ancho) */
+    .fila-opcion {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 16px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .fila-opcion:last-of-type { border-bottom: none; }
+    .fila-opcion input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      accent-color: var(--c-acento);
+      cursor: pointer;
+    }
+    .fila-opcion span { font-size: 1rem; }
+
+    /* Sub-opciones de cursos (ocultas por defecto) */
+    .sub-opciones {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 16px 14px 54px;
+      background: #f7f8fa;
+      border-top: 1px solid #eee;
+    }
+    .sub-opciones.visible { display: flex; }
+
+    /* Chip de sub-curso */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #fff;
+      border: 1.5px solid #ccc;
+      border-radius: 22px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .chip input[type="checkbox"] {
+      width: 18px; height: 18px;
+      accent-color: var(--c-acento);
+      flex-shrink: 0;
+    }
+    .chip.activo {
+      background: var(--c-acento);
+      border-color: var(--c-acento);
+      color: #fff;
+    }
+
+    /* Casilla NEAE independiente */
+    .separador {
+      margin: 18px 0 8px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #777;
+      font-weight: 600;
+    }
+    .fila-neae {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 16px;
+      background: #fff8e1;
+      border: 1.5px solid #f0c040;
+      border-radius: var(--radio);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .fila-neae input[type="checkbox"] {
+      width: 24px; height: 24px;
+      flex-shrink: 0;
+      accent-color: #c87800;
+    }
+    .fila-neae span { font-size: 1rem; }
+
+    /* Botón confirmar */
+    #btn-confirmar {
+      display: block;
+      width: 100%;
+      margin-top: 22px;
+      padding: 17px;
+      background: var(--c-acento);
+      color: #fff;
+      border: none;
+      border-radius: var(--radio);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-confirmar:active { filter: brightness(0.88); }
+
+    #msg-error {
+      display: none;
+      color: var(--c-vencida);
+      font-size: 0.88rem;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* ================================================
+       PANTALLA 2: LISTA DE TAREAS
+       ================================================ */
+    #pantalla-tareas {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 8px 12px 16px;
+    }
+
+    /* Cabecera de fecha */
+    .fecha-header {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #666;
+      font-weight: 700;
+      margin: 18px 0 8px 4px;
+    }
+    .fecha-header:first-child { margin-top: 8px; }
+
+    /* ---- Tarjeta de tarea ---- */
+    .tarjeta {
+      background: var(--c-tarjeta);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      margin-bottom: 10px;
+      border-left: 5px solid #d0d5dc;
+      overflow: hidden;
+      transition: opacity 0.2s;
+    }
+    .tarjeta.estado-vencida  { border-left-color: var(--c-vencida); }
+    .tarjeta.estado-urgente  { border-left-color: var(--c-urgente); }
+    .tarjeta.estado-hecha    { opacity: 0.5; }
+
+    /* Fila superior: checkbox + título */
+    .tarjeta-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 14px 8px;
+    }
+    .tarea-check {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      cursor: pointer;
+      accent-color: var(--c-acento);
+    }
+    .tarea-titulo {
+      flex: 1;
+      font-size: 0.97rem;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .estado-hecha .tarea-titulo {
+      text-decoration: line-through;
+      color: var(--c-hecha);
+    }
+
+    /* Fila de etiquetas */
+    .tarjeta-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 14px 10px 52px;
+    }
+    .etiq {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .etiq-fecha   { background: #e3edf9; color: #1a3a8c; }
+    .etiq-vencida { background: #fde8e8; color: var(--c-vencida); }
+    .etiq-urgente { background: #fef0e0; color: var(--c-urgente); }
+
+    /* Desplegable SÉNECA */
+    details.seneca {
+      border-top: 1px solid #eee;
+    }
+    details.seneca > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 0.83rem;
+      color: var(--c-acento);
+      font-weight: 600;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    details.seneca > summary::-webkit-details-marker { display: none; }
+    details.seneca > summary::before {
+      content: '▶';
+      font-size: 0.65rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    details.seneca[open] > summary::before { transform: rotate(90deg); }
+
+    .seneca-contenido {
+      padding: 2px 14px 14px;
+    }
+    .ruta-bloque {
+      background: #f4f5f7;
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 0.81rem;
+      line-height: 1.7;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .obs-bloque {
+      font-size: 0.84rem;
+      color: #555;
+      font-style: italic;
+      line-height: 1.45;
+    }
+
+    /* Mensaje sin tareas */
+    #sin-tareas {
+      text-align: center;
+      padding: 50px 20px;
+      color: #777;
+      font-size: 0.95rem;
+    }
+
+    /* ================================================
+       PIE DE PÁGINA
+       ================================================ */
+    footer {
+      text-align: center;
+      font-size: 0.73rem;
+      color: #999;
+      padding: 20px 16px;
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================
+     CABECERA FIJA
+     ================================================ -->
+<header>
+  <h1>Final de curso 2025/26</h1>
+  <span id="progreso"></span>
+  <button id="btn-mi-puesto">Mi puesto</button>
+</header>
+
+<main>
+
+  <!-- ================================================
+       PANTALLA 1: SELECCIÓN DE PUESTO
+       ================================================ -->
+  <section id="pantalla-puesto">
+    <h2>¿Cuál es tu puesto?</h2>
+    <p class="subtitulo">Puedes marcar más de uno. Verás solo las tareas que te corresponden.</p>
+
+    <!-- Equipo directivo -->
+    <div class="grupo-opciones">
+      <label class="fila-opcion">
+        <input type="checkbox" id="chk-directivo" value="directivo">
+        <span>Equipo directivo</span>
+      </label>
+    </div>
+
+    <!-- Tutorías y especialistas -->
+    <div class="grupo-opciones">
+
+      <!-- Tutoría Infantil -->
+      <label class="fila-opcion" id="lbl-infantil">
+        <input type="checkbox" id="chk-infantil">
+        <span>Tutoría de Infantil</span>
+      </label>
+      <div class="sub-opciones" id="sub-infantil">
+        <label class="chip" id="chip-i3">
+          <input type="checkbox" value="tut-i3"> 3 años
+        </label>
+        <label class="chip" id="chip-i4">
+          <input type="checkbox" value="tut-i4"> 4 años
+        </label>
+        <label class="chip" id="chip-i5">
+          <input type="checkbox" value="tut-i5"> 5 años
+        </label>
+      </div>
+
+      <!-- Tutoría Primaria -->
+      <label class="fila-opcion" id="lbl-primaria">
+        <input type="checkbox" id="chk-primaria">
+        <span>Tutoría de Primaria</span>
+      </label>
+      <div class="sub-opciones" id="sub-primaria">
+        <label class="chip" id="chip-1p"><input type="checkbox" value="tut-1p"> 1º</label>
+        <label class="chip" id="chip-2p"><input type="checkbox" value="tut-2p"> 2º</label>
+        <label class="chip" id="chip-3p"><input type="checkbox" value="tut-3p"> 3º</label>
+        <label class="chip" id="chip-4p"><input type="checkbox" value="tut-4p"> 4º</label>
+        <label class="chip" id="chip-5p"><input type="checkbox" value="tut-5p"> 5º</label>
+        <label class="chip" id="chip-6p"><input type="checkbox" value="tut-6p"> 6º</label>
+      </div>
+
+      <!-- PT / AL -->
+      <label class="fila-opcion">
+        <input type="checkbox" id="chk-ptal" value="pt-al">
+        <span>Especialista de PT o AL</span>
+      </label>
+
+      <!-- Otro especialista -->
+      <label class="fila-opcion">
+        <input type="checkbox" id="chk-otro" value="otro-esp">
+        <span>Otro especialista</span>
+      </label>
+
+    </div>
+
+    <!-- Casilla independiente: NEAE -->
+    <p class="separador">Alumnado</p>
+    <label class="fila-neae">
+      <input type="checkbox" id="chk-neae">
+      <span>Tengo alumnado NEAE / con ACS</span>
+    </label>
+
+    <button id="btn-confirmar">Ver mis tareas</button>
+    <p id="msg-error">Selecciona al menos un puesto para continuar.</p>
+  </section>
+
+  <!-- ================================================
+       PANTALLA 2: LISTA DE TAREAS
+       ================================================ -->
+  <section id="pantalla-tareas" style="display:none">
+    <div id="contenedor-tareas"></div>
+    <div id="sin-tareas" style="display:none">
+      <p>No hay tareas asignadas para el puesto seleccionado.<br>
+         Pulsa «Mi puesto» para revisar la selección.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================================================
+     PIE DE PÁGINA
+     ================================================ -->
+<footer>
+  Herramienta no oficial. Ante cualquier duda, consulta la guía del centro.<br>
+  Tus marcas se guardan solo en este dispositivo.
+</footer>
+
+<script>
+/* ============================================================
+   DATOS: TAREAS DEL FINAL DE CURSO 2025/26
+   Fuente única de verdad — no modificar fechas, roles ni textos.
+   ============================================================ */
+
+// Alias para no repetir los arrays de roles en cada tarea
+const TODAS_TUT = [
+  'tut-i3','tut-i4','tut-i5',
+  'tut-1p','tut-2p','tut-3p','tut-4p','tut-5p','tut-6p'
+];
+const TODOS_PUESTOS = [
+  'directivo',
+  'tut-i3','tut-i4','tut-i5',
+  'tut-1p','tut-2p','tut-3p','tut-4p','tut-5p','tut-6p',
+  'pt-al','otro-esp'
+];
+
+const TAREAS = [
+  {
+    id: 'aacc-tut',
+    titulo: 'Cuestionario altas capacidades en SÉNECA',
+    fecha: '2026-06-15',
+    roles: ['tut-i5', 'tut-6p'],
+    ruta: 'Cuestionario sobre el alumnado en SÉNECA',
+    obs: 'Protocolo de detección de altas capacidades (5 años y 6º).'
+  },
+  {
+    id: 'aacc-dir',
+    titulo: 'Cuestionarios altas capacidades de las familias: imprimir, repartir y recoger',
+    fecha: '2026-06-15',
+    roles: ['directivo'],
+    ruta: null,
+    obs: 'Se almacenan para estudio del EOE en septiembre.'
+  },
+  {
+    id: 'faltas',
+    titulo: 'Revisar e introducir faltas de asistencia en SÉNECA',
+    fecha: '2026-06-22',
+    roles: [...TODAS_TUT, 'pt-al', 'otro-esp'],
+    ruta: null,
+    obs: 'Comprobar que todas las faltas del curso están correctas.'
+  },
+  {
+    id: 'datos-exp',
+    titulo: 'Revisión de datos complementarios del expediente (medidas de atención a la diversidad)',
+    fecha: '2026-06-22',
+    roles: [...TODAS_TUT],
+    ruta: 'ALUMNADO → INFORMES → DATOS COMPLEMENTARIOS DEL EXPEDIENTE → CUMPLIMENTAR INFORME → elegir expediente e informe → alumno → CUMPLIMENTAR → APARTADO: CUALQUIERA → revisar columnas → ACEPTAR',
+    obs: 'Obligatorio para alumnado con informe psicopedagógico. Para 6º, introducir fecha de entrega del historial (25/06). Colaboración del EOE y de PT si es necesario.'
+  },
+  {
+    id: 'sesion-eval',
+    titulo: 'Sesión de evaluación (lunes por la tarde)',
+    fecha: '2026-06-22',
+    roles: [...TODOS_PUESTOS],
+    ruta: null,
+    obs: 'Se valoran también las medidas y programas de atención a la diversidad.'
+  },
+  {
+    id: 'calif-ord',
+    titulo: 'Calificar indicadores/criterios y trasvasar calificaciones a materias (convocatoria Ordinaria; en 3 y 4 años, 3ª evaluación)',
+    fecha: '2026-06-23',
+    roles: [...TODAS_TUT],
+    ruta: 'ALUMNADO → EVALUACIÓN → CURRÍCULO POR COMPETENCIAS → EVALUACIÓN DEL ALUMNADO → VISIÓN GLOBAL POR ÁREA O MATERIA → seleccionar año, curso, unidad, materia, evaluación → «Trasladar propuesta a la evaluación». Comprobar después en ALUMNADO → EVALUACIÓN → EVALUACIÓN.',
+    obs: null
+  },
+  {
+    id: 'calif-extra',
+    titulo: 'Calificar materias pendientes de calificación extraordinaria y hacerlas constar en acta (Diligencia)',
+    fecha: '2026-06-23',
+    roles: ['tut-2p', 'tut-3p', 'tut-4p', 'tut-5p', 'tut-6p'],
+    ruta: 'ALUMNADO → EVALUACIÓN → CALIFICACIONES → convocatoria Ordinaria → aparecen también las pendientes de cursos anteriores → calificar → ACEPTAR',
+    obs: 'Solo si hay alumnado con materias pendientes de cursos anteriores.'
+  },
+  {
+    id: 'competencial',
+    titulo: 'Introducir calificaciones del nivel competencial adquirido',
+    fecha: '2026-06-23',
+    roles: ['tut-2p', 'tut-4p', 'tut-6p'],
+    ruta: 'ALUMNADO → EVALUACIÓN → CURRÍCULO POR COMPETENCIAS (R.G. LOMLOE) → EVALUACIÓN DEL ALUMNADO → PERFIL COMPETENCIAL/PERFIL DE SALIDA → convocatoria Ordinaria → calificar (botón «Aplicar el nivel» para asignación masiva) → ACEPTAR',
+    obs: null
+  },
+  {
+    id: 'promocion',
+    titulo: 'Introducir/comprobar la promoción del alumnado',
+    fecha: '2026-06-23',
+    roles: ['tut-i5', 'tut-1p', 'tut-2p', 'tut-3p', 'tut-4p', 'tut-5p', 'tut-6p', 'directivo'],
+    ruta: 'ALUMNADO → EVALUACIÓN → CALIFICACIONES → TIPO DE EVALUACIÓN: Promoción del alumnado → convocatoria Ordinaria → introducir «Resultado de la promoción» → ACEPTAR',
+    obs: 'En algunos grupos el equipo directivo ya lo cumplimentó para matricular; corroborar los datos.'
+  },
+  {
+    id: 'inf-ptal',
+    titulo: 'Cumplimentar y firmar digitalmente los informes finales de PT y AL',
+    fecha: '2026-06-23',
+    roles: ['pt-al'],
+    ruta: null,
+    obs: 'Para el alumnado requerido por el sistema. No se imprimen; quedan en SÉNECA.'
+  },
+  {
+    id: 'boletines',
+    titulo: 'Boletines de calificación: cumplimentar, visar y enviar al Punto de Recogida',
+    fecha: '2026-06-24',
+    roles: [...TODAS_TUT],
+    ruta: 'DOCUMENTOS → ALUMNADO → EVALUACIÓN → BOLETINES DE CALIFICACIONES → convocatoria (3ª evaluación en 3-4 años / Ordinaria en el resto) → seleccionar unidad y alumnado → OBSERVACIONES (recomendable) → ACEPTAR → comprobar boletines → «Visado y envío al punto de recogida» → coordenadas DIPA',
+    obs: 'Entrega a familias el 25/06.'
+  },
+  {
+    id: 'eval-diversidad',
+    titulo: 'Evaluación de las medidas y programas de atención a la diversidad',
+    fecha: '2026-06-24',
+    roles: [...TODAS_TUT, 'pt-al'],
+    ruta: 'Comprobar que todos los programas del Módulo de Gestión de la Orientación quedan evaluados; los no integrados, evaluados y entregados en Dirección',
+    obs: 'Se refleja en las actas de evaluación.'
+  },
+  {
+    id: 'prog-especificos',
+    titulo: 'Seguimiento de los programas específicos (cerrar candado al terminar)',
+    fecha: '2026-06-24',
+    roles: ['pt-al'],
+    ruta: 'ALUMNADO → ALUMNADO → GESTIÓN DE LA ORIENTACIÓN → MEDIDAS ESPECÍFICAS ALUMNADO NEAE → PROGRAMAS ESPECÍFICOS → seleccionar alumno → cumplimentar seguimiento → cerrar candado',
+    obs: null
+  },
+  {
+    id: 'nota-media',
+    titulo: 'Cálculo de la nota media de Primaria y menciones honoríficas (media ≥ 9)',
+    fecha: '2026-06-24',
+    roles: ['directivo'],
+    ruta: 'ALUMNADO → MATRICULACIÓN → RELACIÓN DE EXPEDIENTES → EDUCACIÓN PRIMARIA → EXPEDIENTES → icono calculadora «Cálculo de la nota media por área» → alumno por alumno, «Media aritmética de las áreas»',
+    obs: null
+  },
+  {
+    id: 'historiales',
+    titulo: 'Historiales académicos de 6º: cumplimentar y firmar',
+    fecha: '2026-06-24',
+    roles: ['directivo'],
+    ruta: 'DOCUMENTOS → ALUMNADO → EVALUACIÓN → DOCUMENTOS OFICIALES DE EVALUACIÓN → DOCUMENTOS OFICIALES DE ED. PRIMARIA → HISTORIAL ACADÉMICO PARA PRIMARIA (LOMLOE) → firma digital → repositorio',
+    obs: 'Entrega a familias el 25/06 por Punto de Recogida; consignar fecha 25/06 en el expediente.'
+  },
+  {
+    id: 'inf-anuales',
+    titulo: 'Informes anuales de evaluación (3 y 4 años)',
+    fecha: '2026-06-25',
+    roles: ['tut-i3', 'tut-i4'],
+    ruta: 'ALUMNADO → INFORMES → INFORME PERSONAL → CUMPLIMENTAR INFORME → curso, unidad, informe → alumno → CUMPLIMENTAR → APARTADO: CUALQUIERA → ACEPTAR',
+    obs: 'Va al repositorio documental; no se imprime.'
+  },
+  {
+    id: 'inf-ciclo-etapa',
+    titulo: 'Informe final de ciclo o etapa',
+    fecha: '2026-06-25',
+    roles: ['tut-i5', 'tut-2p', 'tut-4p', 'tut-6p'],
+    ruta: 'ALUMNADO → INFORMES → INFORME PERSONAL → CUMPLIMENTAR INFORME (igual que los anuales)',
+    obs: '5 años: Inf. Final Etapa Infantil; 2º y 4º: Inf. Final Ciclo; 6º: Inf. Final Etapa Primaria. NO se entregan a familias; quedan en el repositorio. No se imprimen.'
+  },
+  {
+    id: 'actas',
+    titulo: 'Cumplimentar actas de sesión de evaluación y avisar a Dirección',
+    fecha: '2026-06-25',
+    roles: [...TODAS_TUT],
+    ruta: 'ALUMNADO → EVALUACIÓN → SESIONES DE EVALUACIÓN → seleccionar curso, unidad, convocatoria → «Cumplimentar» → adjuntar escaneo del documento del equipo directivo',
+    obs: 'En 3-4 años, convocatoria 3ª evaluación; en el resto, dos actas (3ª evaluación y Ordinaria).'
+  },
+  {
+    id: 'obs-compartidas',
+    titulo: 'Cumplimentación de observaciones compartidas',
+    fecha: '2026-06-25',
+    roles: [...TODAS_TUT],
+    ruta: null,
+    obs: null
+  },
+  {
+    id: 'actillas',
+    titulo: 'Imprimir actas y actillas, recoger firmas y archivar en Secretaría',
+    fecha: '2026-06-25',
+    roles: ['directivo'],
+    ruta: null,
+    obs: null
+  },
+  {
+    id: 'fichas-personales',
+    titulo: 'Fichas personales del alumnado (5 años)',
+    fecha: '2026-06-25',
+    roles: ['directivo'],
+    ruta: 'DOCUMENTOS → ALUMNADO → EVALUACIÓN → DOCUMENTOS OFICIALES DE EVALUACIÓN → EXPEDIENTE DE 2º CICLO DE ED. INFANTIL → FICHA PERSONAL DEL ALUMNO/A',
+    obs: 'Requiere firma digital de la tutora de Infantil. Útil para alumnado NEAE (datos médicos y psicopedagógicos).'
+  },
+  {
+    id: 'inf-finales-dir',
+    titulo: 'Generar informes finales de ciclo y etapa y enviarlos a bandejas de firmas',
+    fecha: '2026-06-25',
+    roles: ['directivo'],
+    ruta: null,
+    obs: 'Etapa Infantil (5 años), ciclo 2º/4º, etapa 6º. Al repositorio documental.'
+  },
+  {
+    id: 'seg-refuerzo',
+    titulo: 'Seguimiento del programa de refuerzo ANEAE (cerrar candado; adjuntar acta de tutoría a la familia)',
+    fecha: '2026-06-26',
+    roles: ['neae'],
+    ruta: 'ALUMNADO → ALUMNADO → GESTIÓN DE LA ORIENTACIÓN → ORGANIZACIÓN DE LA RESPUESTA EDUCATIVA → PROGRAMA DE ATENCIÓN A LA DIVERSIDAD ANEAE → programa de refuerzo ANEAE EDUCACIÓN BÁSICA',
+    obs: null
+  },
+  {
+    id: 'seg-acs',
+    titulo: 'Seguimiento de adaptaciones curriculares significativas ACS (cerrar candado)',
+    fecha: '2026-06-26',
+    roles: ['neae', 'pt-al'],
+    ruta: 'ALUMNADO → ALUMNADO → GESTIÓN DE LA ORIENTACIÓN → MEDIDAS ESPECÍFICAS ALUMNADO NEAE → ADAPTACIÓN CURRICULAR SIGNIFICATIVA',
+    obs: null
+  },
+  {
+    id: 'resumenes',
+    titulo: 'Resúmenes de escolaridad (5 años): creación y firma digital',
+    fecha: '2026-06-26',
+    roles: ['directivo'],
+    ruta: 'DOCUMENTOS → … → EXPEDIENTE DE 2º CICLO DE ED. INFANTIL → RESUMEN DE ESCOLARIDAD EN EL SEGUNDO CICLO',
+    obs: null
+  },
+  {
+    id: 'expedientes',
+    titulo: 'Expedientes académicos de 6º: creación, firma y envío al repositorio',
+    fecha: '2026-06-30',
+    roles: ['directivo'],
+    ruta: 'DOCUMENTOS → ALUMNADO → EVALUACIÓN → DOCUMENTOS OFICIALES DE EVALUACIÓN → DOCUMENTOS OFICIALES DE ED. PRIMARIA → EXPEDIENTE ACADÉMICO PARA PRIMARIA (LOMLOE)',
+    obs: null
+  },
+  {
+    id: 'rev-pendientes',
+    titulo: 'Revisión de materias «pendientes de calificación extraordinaria» erróneas (cambios masivos en matrículas)',
+    fecha: '2026-06-30',
+    roles: ['directivo'],
+    ruta: 'ALUMNADO → MATRICULACIÓN → RELACIÓN DE MATRÍCULAS → icono «Cambios masivos en las matrículas» → «Eliminar materias pendientes ya superadas»',
+    obs: null
+  }
+];
+
+/* ============================================================
+   UTILIDADES DE FECHA
+   ============================================================ */
+
+// Devuelve "lunes 23 de junio" a partir de "2026-06-23"
+function formatearFecha(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  const f = new Date(a, m - 1, d);
+  const DIAS   = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const MESES  = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                  'agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${DIAS[f.getDay()]} ${d} de ${MESES[m - 1]}`;
+}
+
+// Fecha de hoy a medianoche (sin componente horario)
+function hoyMedianoche() {
+  const h = new Date();
+  return new Date(h.getFullYear(), h.getMonth(), h.getDate());
+}
+
+// Convierte ISO a Date sin hora
+function isoADate(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  return new Date(a, m - 1, d);
+}
+
+// 'vencida' | 'urgente' | 'normal'
+function urgencia(iso) {
+  const t = isoADate(iso);
+  const h = hoyMedianoche();
+  const manana = new Date(h);
+  manana.setDate(h.getDate() + 1);
+  if (t < h)  return 'vencida';
+  if (t <= manana) return 'urgente';
+  return 'normal';
+}
+
+/* ============================================================
+   PERSISTENCIA EN localStorage
+   ============================================================ */
+
+const LS_ROLES  = 'fc2526_roles';
+const LS_HECHAS = 'fc2526_hechas';
+
+function leerRoles() {
+  try { return JSON.parse(localStorage.getItem(LS_ROLES)) || []; }
+  catch { return []; }
+}
+function guardarRoles(arr) {
+  localStorage.setItem(LS_ROLES, JSON.stringify(arr));
+}
+function leerHechas() {
+  try { return new Set(JSON.parse(localStorage.getItem(LS_HECHAS)) || []); }
+  catch { return new Set(); }
+}
+function guardarHechas(set) {
+  localStorage.setItem(LS_HECHAS, JSON.stringify([...set]));
+}
+
+/* ============================================================
+   PANTALLA 1: LÓGICA DE SELECCIÓN DE PUESTO
+   ============================================================ */
+
+// Sincroniza la visibilidad de sub-opciones según el checkbox padre
+function sincronizarSub(chkId, subId, chipClass) {
+  const chk = document.getElementById(chkId);
+  const sub = document.getElementById(subId);
+  if (chk.checked) {
+    sub.classList.add('visible');
+  } else {
+    sub.classList.remove('visible');
+    // Desmarcar y quitar estilo de todos los chips hijos
+    sub.querySelectorAll('input[type="checkbox"]').forEach(c => {
+      c.checked = false;
+      c.closest('.chip').classList.remove('activo');
+    });
+  }
+}
+
+// Muestra la pantalla de puesto y rellena con lo guardado
+function mostrarPantallaPuesto() {
+  document.getElementById('pantalla-puesto').style.display  = 'block';
+  document.getElementById('pantalla-tareas').style.display  = 'none';
+  document.getElementById('progreso').textContent = '';
+  document.getElementById('msg-error').style.display = 'none';
+
+  const roles = leerRoles();
+
+  // Casillas simples
+  document.getElementById('chk-directivo').checked = roles.includes('directivo');
+  document.getElementById('chk-ptal').checked      = roles.includes('pt-al');
+  document.getElementById('chk-otro').checked      = roles.includes('otro-esp');
+  document.getElementById('chk-neae').checked      = roles.includes('neae');
+
+  // Infantil
+  const hayInf = ['tut-i3','tut-i4','tut-i5'].some(r => roles.includes(r));
+  document.getElementById('chk-infantil').checked = hayInf;
+  document.querySelectorAll('#sub-infantil input[type="checkbox"]').forEach(c => {
+    c.checked = roles.includes(c.value);
+    c.closest('.chip').classList.toggle('activo', c.checked);
+  });
+  document.getElementById('sub-infantil').classList.toggle('visible', hayInf);
+
+  // Primaria
+  const hayPri = ['tut-1p','tut-2p','tut-3p','tut-4p','tut-5p','tut-6p'].some(r => roles.includes(r));
+  document.getElementById('chk-primaria').checked = hayPri;
+  document.querySelectorAll('#sub-primaria input[type="checkbox"]').forEach(c => {
+    c.checked = roles.includes(c.value);
+    c.closest('.chip').classList.toggle('activo', c.checked);
+  });
+  document.getElementById('sub-primaria').classList.toggle('visible', hayPri);
+}
+
+// Recoge los roles marcados y navega a las tareas
+function confirmarPuesto() {
+  const roles = [];
+
+  if (document.getElementById('chk-directivo').checked) roles.push('directivo');
+  if (document.getElementById('chk-ptal').checked)      roles.push('pt-al');
+  if (document.getElementById('chk-otro').checked)      roles.push('otro-esp');
+
+  document.querySelectorAll('#sub-infantil input:checked').forEach(c => roles.push(c.value));
+  document.querySelectorAll('#sub-primaria input:checked').forEach(c => roles.push(c.value));
+
+  // neae solo si el usuario tiene al menos una tutoría marcada
+  const esTutor = roles.some(r => r.startsWith('tut-'));
+  if (document.getElementById('chk-neae').checked && esTutor) roles.push('neae');
+
+  if (roles.length === 0) {
+    document.getElementById('msg-error').style.display = 'block';
+    return;
+  }
+
+  guardarRoles(roles);
+  mostrarPantallaTareas();
+}
+
+/* ============================================================
+   PANTALLA 2: RENDERIZADO DE TAREAS
+   ============================================================ */
+
+function mostrarPantallaTareas() {
+  document.getElementById('pantalla-puesto').style.display  = 'none';
+  document.getElementById('pantalla-tareas').style.display  = 'block';
+  renderizarTareas();
+}
+
+function renderizarTareas() {
+  const roles  = leerRoles();
+  const hechas = leerHechas();
+
+  // Filtrar tareas que coincidan con al menos uno de los roles del usuario
+  const misTareas = TAREAS.filter(t =>
+    t.roles.some(r => roles.includes(r))
+  );
+
+  // Ordenar: primero por fecha, luego las hechas al final dentro de la misma fecha
+  misTareas.sort((a, b) => {
+    const df = isoADate(a.fecha) - isoADate(b.fecha);
+    if (df !== 0) return df;
+    return (hechas.has(a.id) ? 1 : 0) - (hechas.has(b.id) ? 1 : 0);
+  });
+
+  // Actualizar contador de progreso en cabecera
+  const nHechas = misTareas.filter(t => hechas.has(t.id)).length;
+  document.getElementById('progreso').textContent =
+    `${nHechas} de ${misTareas.length} hechas`;
+
+  const contenedor = document.getElementById('contenedor-tareas');
+  const sinTareas  = document.getElementById('sin-tareas');
+
+  if (misTareas.length === 0) {
+    contenedor.innerHTML = '';
+    sinTareas.style.display = 'block';
+    return;
+  }
+  sinTareas.style.display = 'none';
+
+  // Agrupar por fecha para mostrar separador de día
+  const grupos = {};
+  misTareas.forEach(t => {
+    if (!grupos[t.fecha]) grupos[t.fecha] = [];
+    grupos[t.fecha].push(t);
+  });
+
+  let html = '';
+  for (const [fecha, tareas] of Object.entries(grupos)) {
+    html += `<p class="fecha-header">${formatearFecha(fecha)}</p>`;
+    tareas.forEach(t => { html += htmlTarjeta(t, hechas); });
+  }
+
+  contenedor.innerHTML = html;
+
+  // Listeners para los checkboxes de cada tarea
+  contenedor.querySelectorAll('.tarea-check').forEach(chk => {
+    chk.addEventListener('change', function () {
+      const set = leerHechas();
+      if (this.checked) set.add(this.dataset.id);
+      else              set.delete(this.dataset.id);
+      guardarHechas(set);
+      renderizarTareas(); // re-renderizar para reordenar y actualizar contador
+    });
+  });
+
+  // Efecto visual en chips de sub-curso al pulsar (solo informativo, ya no funcional aquí)
+  contenedor.querySelectorAll('.chip input').forEach(inp => {
+    inp.addEventListener('change', function () {
+      this.closest('.chip').classList.toggle('activo', this.checked);
+    });
+  });
+}
+
+// Construye el HTML completo de una tarjeta
+function htmlTarjeta(t, hechas) {
+  const hecha = hechas.has(t.id);
+  const urg   = hecha ? 'normal' : urgencia(t.fecha);
+
+  // Clase de borde lateral
+  const claseEstado = hecha
+    ? 'estado-hecha'
+    : urg === 'vencida' ? 'estado-vencida'
+    : urg === 'urgente' ? 'estado-urgente'
+    : '';
+
+  // Etiqueta de urgencia
+  let etiqUrgencia = '';
+  if (!hecha && urg === 'vencida')
+    etiqUrgencia = '<span class="etiq etiq-vencida">VENCIDA</span>';
+  else if (!hecha && urg === 'urgente')
+    etiqUrgencia = '<span class="etiq etiq-urgente">HOY / MAÑANA</span>';
+
+  // Bloque desplegable (solo si hay ruta u observaciones)
+  let detalle = '';
+  if (t.ruta || t.obs) {
+    const labelSummary = t.ruta ? 'Ver ruta en SÉNECA' : 'Ver observaciones';
+    let interior = '<div class="seneca-contenido">';
+    if (t.ruta)
+      interior += `<div class="ruta-bloque">${esc(t.ruta)}</div>`;
+    if (t.obs)
+      interior += `<p class="obs-bloque">${esc(t.obs)}</p>`;
+    interior += '</div>';
+    detalle = `<details class="seneca"><summary>${labelSummary}</summary>${interior}</details>`;
+  }
+
+  return `
+<div class="tarjeta ${claseEstado}">
+  <div class="tarjeta-top">
+    <input type="checkbox" class="tarea-check" data-id="${t.id}"
+      ${hecha ? 'checked' : ''} aria-label="Marcar como hecha">
+    <span class="tarea-titulo">${esc(t.titulo)}</span>
+  </div>
+  <div class="tarjeta-meta">
+    <span class="etiq etiq-fecha">${formatearFecha(t.fecha)}</span>
+    ${etiqUrgencia}
+  </div>
+  ${detalle}
+</div>`;
+}
+
+// Escapa caracteres HTML para evitar inyección
+function esc(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ============================================================
+   EVENTOS GLOBALES
+   ============================================================ */
+
+// Checkbox padre de Infantil: muestra/oculta sub-cursos
+document.getElementById('chk-infantil').addEventListener('change', function () {
+  sincronizarSub('chk-infantil', 'sub-infantil', '.chk-tut-inf');
+});
+
+// Checkbox padre de Primaria: muestra/oculta sub-cursos
+document.getElementById('chk-primaria').addEventListener('change', function () {
+  sincronizarSub('chk-primaria', 'sub-primaria', '.chk-tut-pri');
+});
+
+// Efecto visual en chips de sub-curso al marcar/desmarcar
+document.querySelectorAll('.chip input[type="checkbox"]').forEach(inp => {
+  inp.addEventListener('change', function () {
+    this.closest('.chip').classList.toggle('activo', this.checked);
+  });
+});
+
+// Botón «Confirmar puesto»
+document.getElementById('btn-confirmar').addEventListener('click', confirmarPuesto);
+
+// Botón «Mi puesto» en cabecera
+document.getElementById('btn-mi-puesto').addEventListener('click', mostrarPantallaPuesto);
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+(function init() {
+  // Si ya hay roles guardados, ir directamente a las tareas
+  if (leerRoles().length > 0) {
+    mostrarPantallaTareas();
+  } else {
+    mostrarPantallaPuesto();
+  }
+})();
+</script>
+</body>
+</html>
