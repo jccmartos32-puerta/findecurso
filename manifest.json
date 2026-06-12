@@ -9,7 +9,7 @@
   "lang": "es",
   "icons": [
     {
-      "src": "icono%20aplicaci%C3%B3n.png",
+      "src": "icono.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
